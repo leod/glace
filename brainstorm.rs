@@ -64,7 +64,7 @@ fn vertex(
 fn fragment(
     uniforms: &Uniforms,
     varyings: &Varyings,
-    output: &mut Fragment,
+    fragment: &mut Fragment,
 ) {
     fragment.albedo = varyings.color;
     fragment.normal = vec3(1.0, 0.0, 0.0);
