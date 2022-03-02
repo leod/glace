@@ -36,15 +36,28 @@ struct Fragment {
     normal: Vector3<f32>,
 }
 
-#[glace(vertex)]
+#[glace]
+fn foo(
+    color: Vector3<f32>,
+) {
+    
+}
+
+fn foo(consts: &Consts) -> String {
+
+}
+
+#[glace(vertex, requires(foo))]
 fn vertex(
     uniforms: &Uniforms,
     vertex: &Vertex,
     varyings: &mut Varyings,
 ) {
+    varyings.sdfd = foo(vertex.color);
     varyings.position = uniforms.view_matrices.camera_to_ndc
         * uniforms.view_matrices.world_to_camera
         * vec4(vertex.position, 1.0);
+
     varyings.color = texture(uniforms.texture, vertex.uv);
 }
 
@@ -90,6 +103,8 @@ impl Renderer {
                 texture: &self.texture,
             },
             data,
+            &draw_params,
+            &framebuffer,
         );
     }
 }
