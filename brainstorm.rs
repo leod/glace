@@ -19,10 +19,9 @@ struct Consts {
 }
 
 #[derive(UniformInput)]
-#[glace(bindings = UniformBindings)]
-struct Uniforms {
-    view_matrices: ViewMatrices,
-    texture: Texture2d,
+struct Uniforms<'a> {
+    view_matrices: &'a UniformBuffer<ViewMatrices>,
+    texture: &'a Texture2d,
 }
 
 #[derive(VertexOutput)]
@@ -65,7 +64,7 @@ fn vertex(
 fn fragment(
     uniforms: &Uniforms,
     varyings: &Varyings,
-    fragment: &mut Fragment,
+    output: &mut Fragment,
 ) {
     fragment.albedo = varyings.color;
     fragment.normal = vec3(1.0, 0.0, 0.0);
