@@ -28,3 +28,13 @@ pub trait VertexInput: Fields {}
 pub trait VertexOutput: Fields {}
 
 pub trait FragmentOutput: Fields {}
+
+trait ProgramDef {
+    type UniformInput: UniformInput;
+    type VertexInput: VertexInput;
+    type VertexOutput: VertexOutput;
+    type FragmentOutput: FragmentOutput;
+
+    fn vertex(&self) -> String;
+    fn fragment(&self) -> String;
+}
