@@ -1,5 +1,5 @@
 use crevice::{glsl::GlslStruct, std140::AsStd140};
-use glsl::syntax::{Expr, TypeSpecifier};
+use glsl::syntax::{Expr, Statement, TypeSpecifier};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
@@ -11,11 +11,11 @@ pub trait Fields {
     const FIELDS: &'static [Field];
 }
 
-pub trait ConstInput: Fields {
-    fn const_values(&self) -> Vec<Expr>;
+pub trait ConstInput {
+    fn const_expr(&self) -> Expr;
 }
 
-pub trait Uniform: AsStd140 + GlslStruct {}
+pub trait UniformBlock: AsStd140 + GlslStruct {}
 
 pub trait UniformInput: Fields {}
 
@@ -29,12 +29,14 @@ pub trait VertexOutput: Fields {}
 
 pub trait FragmentOutput: Fields {}
 
-trait ProgramDef {
+pub struct VertexShaderDef {}
+
+pub trait ProgramDef {
     type UniformInput: UniformInput;
     type VertexInput: VertexInput;
     type VertexOutput: VertexOutput;
     type FragmentOutput: FragmentOutput;
 
-    fn vertex(&self) -> String;
-    fn fragment(&self) -> String;
+    fn vertex(&self) -> Statement;
+    fn fragment(&self) -> Statement;
 }

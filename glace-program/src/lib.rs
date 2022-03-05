@@ -1,5 +1,7 @@
 pub use crevice;
 pub use glsl;
 
-mod def;
+mod gen;
 mod sig;
+
+pub use sig::ProgramDef;
