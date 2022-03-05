@@ -19,9 +19,9 @@ struct Consts {
 }
 
 #[derive(UniformInput)]
-struct Uniforms<'a> {
-    view_matrices: &'a UniformBuffer<ViewMatrices>,
-    texture: &'a Texture2d,
+struct Uniforms {
+    view_matrices: ViewMatrices,
+    texture: Texture2d,
 }
 
 #[derive(VertexOutput)]
@@ -33,6 +33,47 @@ struct Varyings {
 struct Fragment {
     albedo: Vector3<f32>,
     normal: Vector3<f32>,
+}
+
+struct MyProgramDef {
+    num_iterations: usize,
+}
+
+#[glace]
+impl ProgramDef for MyProgramDef {
+    type UniformInput = Uniforms;
+    type VertexInput = Vertex;
+    type VertexOutput = Varyings;
+    type FragmentOutput = Fragment;
+
+    #[glace(glsl)]
+    fn vertex(
+        &self,
+        uniforms: &Uniforms,
+        vertex: &Vertex,
+        varyings: &mut Varyings,
+    ) {
+        for (int i = 0; i < self.num_iterations; i++) {
+
+        }
+        varyings.sdfd = foo(vertex.color);
+        varyings.position = uniforms.view_matrices.camera_to_ndc
+            * uniforms.view_matrices.world_to_camera
+            * vec4(vertex.position, 1.0);
+
+        varyings.color = texture(uniforms.texture, vertex.uv);
+    }
+
+    #[glace(glsl)]
+    fn fragment(
+        &self,
+        uniforms: &Uniforms,
+        varyings: &Varyings,
+        fragment: &mut Fragment,
+    ) {
+        fragment.albedo = varyings.color;
+        fragment.normal = vec3(1.0, 0.0, 0.0);
+    }
 }
 
 #[glace]
@@ -48,27 +89,9 @@ fn foo(consts: &Consts) -> String {
 
 #[glace(vertex, requires(foo))]
 fn vertex(
-    uniforms: &Uniforms,
-    vertex: &Vertex,
-    varyings: &mut Varyings,
 ) {
-    varyings.sdfd = foo(vertex.color);
-    varyings.position = uniforms.view_matrices.camera_to_ndc
-        * uniforms.view_matrices.world_to_camera
-        * vec4(vertex.position, 1.0);
-
-    varyings.color = texture(uniforms.texture, vertex.uv);
 }
 
-#[glace(fragment)]
-fn fragment(
-    uniforms: &Uniforms,
-    varyings: &Varyings,
-    fragment: &mut Fragment,
-) {
-    fragment.albedo = varyings.color;
-    fragment.normal = vec3(1.0, 0.0, 0.0);
-}
 
 struct Renderer {
     program: Program<Uniform, Vertex, Fragment>,
