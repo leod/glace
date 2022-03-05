@@ -1,7 +1,7 @@
 
 // ----------------------------------
 
-#[derive(Uniform)]
+#[derive(UniformBlock)]
 struct ViewMatrices {
     world_to_camera: Matrix4<f32>,
     camera_to_ndc: Matrix4<f32>,
@@ -11,11 +11,6 @@ struct ViewMatrices {
 struct TexVertex {
     position: Vector3<f32>,
     uv: Vector2<f32>,
-}
-
-#[derive(ConstInput)]
-struct Consts {
-    radians_per_sec: f32,
 }
 
 #[derive(UniformInput)]
@@ -39,7 +34,6 @@ struct MyProgramDef {
     num_iterations: usize,
 }
 
-#[glace]
 impl ProgramDef for MyProgramDef {
     type UniformInput = Uniforms;
     type VertexInput = Vertex;
