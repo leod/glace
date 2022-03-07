@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 glsl = "6.0"
 crevice = "0.8"
+thiserror = "1.0"
