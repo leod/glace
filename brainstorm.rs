@@ -1,7 +1,7 @@
 
 // ----------------------------------
 
-#[derive(UniformBlock)]
+#[derive(Uniform)]
 struct ViewMatrices {
     world_to_camera: Matrix4<f32>,
     camera_to_ndc: Matrix4<f32>,
@@ -13,7 +13,13 @@ struct TexVertex {
     uv: Vector2<f32>,
 }
 
+#[derive(ConstInput)]
+struct Consts {
+    radians_per_sec: f32,
+}
+
 #[derive(UniformInput)]
+#[glace(bindings = UniformBindings)]
 struct Uniforms {
     view_matrices: ViewMatrices,
     texture: Texture2d,
@@ -30,46 +36,6 @@ struct Fragment {
     normal: Vector3<f32>,
 }
 
-struct MyProgramDef {
-    num_iterations: usize,
-}
-
-impl ProgramDef for MyProgramDef {
-    type UniformInput = Uniforms;
-    type VertexInput = Vertex;
-    type VertexOutput = Varyings;
-    type FragmentOutput = Fragment;
-
-    #[glace(glsl)]
-    fn vertex(
-        &self,
-        uniforms: &Uniforms,
-        vertex: &Vertex,
-        varyings: &mut Varyings,
-    ) {
-        for (int i = 0; i < self.num_iterations; i++) {
-
-        }
-        varyings.sdfd = foo(vertex.color);
-        varyings.position = uniforms.view_matrices.camera_to_ndc
-            * uniforms.view_matrices.world_to_camera
-            * vec4(vertex.position, 1.0);
-
-        varyings.color = texture(uniforms.texture, vertex.uv);
-    }
-
-    #[glace(glsl)]
-    fn fragment(
-        &self,
-        uniforms: &Uniforms,
-        varyings: &Varyings,
-        fragment: &mut Fragment,
-    ) {
-        fragment.albedo = varyings.color;
-        fragment.normal = vec3(1.0, 0.0, 0.0);
-    }
-}
-
 #[glace]
 fn foo(
     color: Vector3<f32>,
@@ -78,14 +44,32 @@ fn foo(
 }
 
 fn foo(consts: &Consts) -> String {
-
+    
 }
 
 #[glace(vertex, requires(foo))]
 fn vertex(
+    uniforms: &Uniforms,
+    vertex: &Vertex,
+    varyings: &mut Varyings,
 ) {
+    varyings.sdfd = foo(vertex.color);
+    varyings.position = uniforms.view_matrices.camera_to_ndc
+        * uniforms.view_matrices.world_to_camera
+        * vec4(vertex.position, 1.0);
+
+    varyings.color = texture(uniforms.texture, vertex.uv);
 }
 
+#[glace(fragment)]
+fn fragment(
+    uniforms: &Uniforms,
+    varyings: &Varyings,
+    fragment: &mut Fragment,
+) {
+    fragment.albedo = varyings.color;
+    fragment.normal = vec3(1.0, 0.0, 0.0);
+}
 
 struct Renderer {
     program: Program<Uniform, Vertex, Fragment>,
