@@ -1,5 +1,5 @@
 use crevice::{glsl::GlslStruct, std140::AsStd140};
-use glsl::syntax::{Expr, Statement, TypeSpecifier};
+use glsl::syntax::{Declaration, Expr, Statement, TypeSpecifier};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
@@ -17,7 +17,9 @@ pub trait ConstInput {
 
 pub trait UniformBlock: AsStd140 + GlslStruct {}
 
-pub trait UniformInput: Fields {}
+pub trait UniformInput: Fields {
+    fn declarations() -> Vec<Declaration>;
+}
 
 pub trait Vertex: Fields {
     const OFFSETS: &'static [usize];
