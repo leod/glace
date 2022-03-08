@@ -20,8 +20,12 @@ pub enum GenError {
     ParseError(#[from] ParseError),
 }
 
-pub fn uniform_block_name(identifier: &str) -> String {
-    format!("__glace_uniform_block_{}", identifier)
+pub fn uniform_input_name(identifier: &str) -> String {
+    format!("_glace_uniform_input_{}_", identifier)
+}
+
+pub fn uniform_block_identifier(identifier: &str) -> String {
+    format!("_glace_uniform_block_{}_", identifier)
 }
 
 pub fn uniform_block_field(field: &GlslField) -> Result<StructFieldSpecifier, GenError> {
@@ -44,13 +48,13 @@ pub fn uniform_block<U: GlslStruct>(identifier: &str) -> Result<Block, GenError>
             )])
             .unwrap(),
         },
-        name: Identifier::new(identifier)?,
+        name: Identifier::new(uniform_block_identifier(identifier))?,
         fields: U::FIELDS
             .iter()
             .map(uniform_block_field)
             .collect::<Result<_, _>>()?,
         identifier: Some(ArrayedIdentifier {
-            ident: Identifier::new(uniform_block_name(identifier))?,
+            ident: Identifier::new(uniform_input_name(identifier))?,
             array_spec: None,
         }),
     })
