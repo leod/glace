@@ -6,5 +6,6 @@ mod sig;
 pub mod gen;
 
 pub use sig::{
-    ConstInput, Fields, ProgramDef, UniformBlock, UniformInput, VertexInput, VertexOutput,
+    ConstInput, Fields, ProgramDef, UniformBlock, UniformInput, UniformValue, VertexInput,
+    VertexOutput,
 };
