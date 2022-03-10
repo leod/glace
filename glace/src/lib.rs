@@ -1,1 +1,1 @@
-pub use glace_program as program;
+pub use glace_program_def as program;
