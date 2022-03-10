@@ -15,7 +15,11 @@ pub trait ConstInput {
     fn const_expr(&self) -> Expr;
 }
 
-pub trait UniformBlock: AsStd140 + GlslStruct {}
+pub trait UniformValue {}
+
+pub trait UniformBlock: AsStd140 + GlslStruct {
+    const FIELDS: &'static [Field];
+}
 
 pub trait UniformInput: Fields {
     fn declarations() -> Vec<Declaration>;

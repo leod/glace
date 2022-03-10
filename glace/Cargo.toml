@@ -7,5 +7,9 @@ edition = "2021"
 
 [dependencies]
 glace-program-def = { path = "../glace-program-def" }
+glace-derive = { optional = true, path = "../glace-derive" }
 
 glow = "0.11"
+
+[features]
+derive = ["glace-derive"]
