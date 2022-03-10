@@ -6,6 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-glace-program = { path = "../glace-program" }
+glace-program-def = { path = "../glace-program-def" }
 
 glow = "0.11"

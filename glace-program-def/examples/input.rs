@@ -11,7 +11,7 @@ struct CameraMatrices {
 }
 
 fn main() {
-    let tree = glace_program::gen::uniform_block::<CameraMatrices>("camera_matrices").unwrap();
+    let tree = glace_program_def::gen::uniform_block::<CameraMatrices>("camera_matrices").unwrap();
 
     let mut s = String::new();
     show_block(&mut s, &tree);
