@@ -9,7 +9,7 @@ use glsl::{
 };
 use thiserror::Error;
 
-use crate::{ProgramDef, UniformInput};
+use crate::{Field, ProgramDef, UniformBlock, UniformInput};
 
 #[derive(Error, Debug)]
 pub enum GenError {
@@ -28,10 +28,10 @@ pub fn uniform_block_identifier(identifier: &str) -> String {
     format!("_glace_uniform_block_{}_", identifier)
 }
 
-pub fn uniform_block_field(field: &GlslField) -> Result<StructFieldSpecifier, GenError> {
+pub fn uniform_block_field(field: &Field) -> Result<StructFieldSpecifier, GenError> {
     Ok(StructFieldSpecifier {
         qualifier: None,
-        ty: TypeSpecifier::parse(field.ty)?,
+        ty: field.ty.clone(),
         identifiers: NonEmpty::from_non_empty_iter([ArrayedIdentifier {
             ident: Identifier::new(field.name)?,
             array_spec: None,
@@ -40,7 +40,7 @@ pub fn uniform_block_field(field: &GlslField) -> Result<StructFieldSpecifier, Ge
     })
 }
 
-pub fn uniform_block<U: GlslStruct>(identifier: &str) -> Result<Block, GenError> {
+pub fn uniform_block<U: UniformBlock>(identifier: &str) -> Result<Block, GenError> {
     Ok(Block {
         qualifier: TypeQualifier {
             qualifiers: NonEmpty::from_non_empty_iter([TypeQualifierSpec::Storage(
