@@ -83,6 +83,7 @@ name = "glace-program-def"
 version = "0.0.0"
 dependencies = [
  "crevice",
+ "glace-derive",
  "glsl",
  "thiserror",
 ]

@@ -9,3 +9,6 @@ edition = "2021"
 glsl = "6.0"
 crevice = "0.8"
 thiserror = "1.0"
+
+[dev-dependencies]
+glace-derive = { path = "../glace-derive" }

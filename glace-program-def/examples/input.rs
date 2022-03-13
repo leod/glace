@@ -1,10 +1,12 @@
 use crevice::{glsl::GlslStruct, std140::AsStd140};
+use glace_derive::UniformBlock;
+use glace_program_def::UniformBlock;
 use glsl::{
     syntax::Declaration,
     transpiler::glsl::{show_block, show_declaration},
 };
 
-#[derive(GlslStruct, AsStd140)]
+#[derive(AsStd140, UniformBlock)]
 struct CameraMatrices {
     view: f32,
     projection: f32,

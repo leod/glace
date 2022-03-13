@@ -1,10 +1,14 @@
-use crevice::{glsl::GlslStruct, std140::AsStd140};
+mod uniform_type;
+
+use crevice::std140::AsStd140;
 use glsl::syntax::{Declaration, Expr, Statement, TypeSpecifier};
+
+pub use uniform_type::UniformType;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
     pub name: &'static str,
-    pub type_specifier: TypeSpecifier,
+    pub ty: TypeSpecifier,
 }
 
 pub trait Fields {
@@ -15,9 +19,8 @@ pub trait ConstInput {
     fn const_expr(&self) -> Expr;
 }
 
-pub trait UniformValue {}
-
-pub trait UniformBlock: AsStd140 + GlslStruct {
+pub unsafe trait UniformBlock: AsStd140 {
+    const NAME: &'static str;
     const FIELDS: &'static [Field];
 }
 
