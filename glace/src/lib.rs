@@ -1,5 +1,14 @@
-pub use glace_program_def as program_def;
+pub use crevice;
+pub use glsl;
+
+mod sig;
+
+pub mod gen;
+
+pub use sig::{
+    ConstInput, Field, ProgramDef, UniformBlock, UniformInput, UniformType, VertexInput,
+    VertexOutput,
+};
 
 #[cfg(feature = "derive")]
-#[doc(hidden)]
-pub use glace_derive::*;
+pub use glace_derive::UniformBlock;

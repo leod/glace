@@ -14,7 +14,7 @@ pub fn derive(input: DeriveInput) -> Result<TokenStream2> {
         )),
     };
 
-    let trait_path: Path = parse_quote!(::glace_program_def::UniformBlock);
+    let trait_path: Path = parse_quote!(::glace::UniformBlock);
 
     let name = input.ident;
     let name_str = Literal::string(&name.to_string());
@@ -26,9 +26,9 @@ pub fn derive(input: DeriveInput) -> Result<TokenStream2> {
         let field_ty = &field.ty;
 
         quote! {
-            ::glace_program_def::Field {
+            ::glace::Field {
                 name: #field_name_str,
-                ty: <#field_ty as ::glace_program_def::UniformType>::TYPE_SPECIFIER,
+                ty: <#field_ty as ::glace::UniformType>::TYPE_SPECIFIER,
             }
         }
     });
@@ -36,7 +36,7 @@ pub fn derive(input: DeriveInput) -> Result<TokenStream2> {
     Ok(quote! {
         unsafe impl #impl_generics #trait_path for #name #ty_generics #where_clause {
             const NAME: &'static str = #name_str;
-            const FIELDS: &'static [::glace_program_def::Field] = &[
+            const FIELDS: &'static [::glace::Field] = &[
                 #( #fields, )*
             ];
         }

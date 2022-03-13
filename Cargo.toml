@@ -1,2 +1,2 @@
 [workspace]
-members = ["glace", "glace-program-def"]
+members = ["glace", "glace-derive"]
