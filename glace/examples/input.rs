@@ -1,6 +1,5 @@
-use crevice::{glsl::GlslStruct, std140::AsStd140};
-use glace_derive::UniformBlock;
-use glace_program_def::UniformBlock;
+use crevice::std140::AsStd140;
+use glace::UniformBlock;
 use glsl::{
     syntax::Declaration,
     transpiler::glsl::{show_block, show_declaration},
@@ -13,7 +12,7 @@ struct CameraMatrices {
 }
 
 fn main() {
-    let tree = glace_program_def::gen::uniform_block::<CameraMatrices>("camera_matrices").unwrap();
+    let tree = glace::gen::uniform_block::<CameraMatrices>("camera_matrices").unwrap();
 
     let mut s = String::new();
     show_block(&mut s, &tree);
