@@ -1,4 +1,3 @@
-use crevice::glsl::{GlslField, GlslStruct};
 use glsl::{
     parser::{Parse as _, ParseError},
     syntax::{

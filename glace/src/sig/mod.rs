@@ -15,7 +15,7 @@ pub trait Fields {
     const FIELDS: &'static [Field];
 }
 
-pub trait ConstInput {
+pub trait ConstValue {
     fn const_expr(&self) -> Expr;
 }
 
@@ -38,14 +38,32 @@ pub trait VertexOutput: Fields {}
 
 pub trait FragmentOutput: Fields {}
 
-pub struct VertexShaderDef {}
-
 pub trait ProgramDef {
-    type UniformInput: UniformInput;
-    type VertexInput: VertexInput;
-    type VertexOutput: VertexOutput;
-    type FragmentOutput: FragmentOutput;
+    type Uniform: UniformInput;
+    type Vertex: VertexInput;
+    type Varying: VertexOutput;
+    type Fragment: FragmentOutput;
 
     fn vertex(&self) -> Statement;
     fn fragment(&self) -> Statement;
+
+    #[doc(hidden)]
+    fn _glace_type_check_vertex(
+        &self,
+        _uniform: &Self::Uniform,
+        _vertex: &Self::Vertex,
+        _varying: &mut Self::Varying,
+    ) {
+        unreachable!("`ProgramDef::_glace_type_check_vertex` should never be called.");
+    }
+
+    #[doc(hidden)]
+    fn _glace_type_check_fragment(
+        &self,
+        _uniform: &Self::Uniform,
+        _varying: &Self::Varying,
+        _fragment: &mut Self::Fragment,
+    ) {
+        unreachable!("`ProgramDef::_glace_type_check_fragment` should never be called.");
+    }
 }
