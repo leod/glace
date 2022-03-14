@@ -19,10 +19,9 @@ struct Consts {
 }
 
 #[derive(UniformInput)]
-#[glace(bindings = UniformBindings)]
-struct Uniforms {
-    view_matrices: ViewMatrices,
-    texture: Texture2d,
+struct Uniforms<'a> {
+    view_matrices: &'a UniformBuffer<ViewMatrices>,
+    texture: &'a Texture2d,
 }
 
 #[derive(VertexOutput)]
@@ -44,14 +43,14 @@ fn foo(
 }
 
 fn foo(consts: &Consts) -> String {
-    
+
 }
 
 #[glace(vertex, requires(foo))]
 fn vertex(
-    uniforms: &Uniforms,
-    vertex: &Vertex,
-    varyings: &mut Varyings,
+    #[uniform_input] uniforms: &Uniforms,
+    #[vertex_input] vertex: &Vertex,
+    #[vertex_output] varyings: &mut Varyings,
 ) {
     varyings.sdfd = foo(vertex.color);
     varyings.position = uniforms.view_matrices.camera_to_ndc
