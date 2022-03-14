@@ -1,87 +1,94 @@
-
-// ----------------------------------
-
-#[derive(Uniform)]
+#[derive(glace::UniformBlock)]
 struct ViewMatrices {
     world_to_camera: Matrix4<f32>,
     camera_to_ndc: Matrix4<f32>,
 }
 
-#[derive(Vertex)]
-struct TexVertex {
-    position: Vector3<f32>,
-    uv: Vector2<f32>,
+#[derive(glace::Vertex)]
+struct Vertex {
+    tex: Vector2<f32>,
+    pos: Vector3<f32>,
 }
 
-#[derive(ConstInput)]
-struct Consts {
-    radians_per_sec: f32,
-}
-
-#[derive(UniformInput)]
-struct Uniforms<'a> {
-    view_matrices: &'a UniformBuffer<ViewMatrices>,
-    texture: &'a Texture2d,
-}
-
-#[derive(VertexOutput)]
-struct Varyings {
+#[derive(glace::Vertex)]
+struct Instance {
     color: Vector3<f32>,
 }
 
-#[derive(FragmentOutput)]
-struct Fragment {
+#[derive(glace::UniformSet)]
+struct UniformSet {
+    #[layout(binding = 0)]
+    view_matrices: UniformData<ViewMatrices>,
+
+    #[layout(binding = 1)]
+    texture: UniformSampler<Texture2d>,
+}
+
+#[derive(glace::VertexSet)]
+struct VertexSet {
+    instance: VertexData<Instance>,
+    vertex: VertexData<Vertex>,
+}
+
+#[derive(glace::VaryingFields)]
+struct VaryingFields {
+    color: Vector3<f32>,
+}
+
+#[derive(glace::FragmentFields)]
+struct FragmentFields {
     albedo: Vector3<f32>,
     normal: Vector3<f32>,
 }
 
-#[glace]
-fn foo(
-    color: Vector3<f32>,
-) {
-    
+struct MyProgram {
+    radians_per_sec: f32,
 }
 
-fn foo(consts: &Consts) -> String {
+impl ProgramDef for MyProgram {
+    type UniformSet = UniformSet;
+    type VertexSet = VertexSet;
+    type VaryingFields = VaryingFields;
+    type FragmentFields = FragmentFields;
 
-}
+    #[glace(vertex_shader)]
+    fn vertex_shader(
+        &self,
+        uniform: UniformSet,
+        input: VertexSet,
+        output: &mut VaryingFields,
+    ) {
+        gl_Position = uniform.view_matrices.camera_to_ndc
+            * uniform.view_matrices.world_to_camera
+            * vec4(input.vertex.position, 1.0);
 
-#[glace(vertex, requires(foo))]
-fn vertex(
-    #[uniform_input] uniforms: &Uniforms,
-    #[vertex_input] vertex: &Vertex,
-    #[vertex_output] varyings: &mut Varyings,
-) {
-    varyings.sdfd = foo(vertex.color);
-    varyings.position = uniforms.view_matrices.camera_to_ndc
-        * uniforms.view_matrices.world_to_camera
-        * vec4(vertex.position, 1.0);
+        output.color = vertex.instance.color * texture(uniform.texture, input.vertex.tex);
+    }
 
-    varyings.color = texture(uniforms.texture, vertex.uv);
-}
-
-#[glace(fragment)]
-fn fragment(
-    uniforms: &Uniforms,
-    varyings: &Varyings,
-    fragment: &mut Fragment,
-) {
-    fragment.albedo = varyings.color;
-    fragment.normal = vec3(1.0, 0.0, 0.0);
+    #[glace(fragment_shader)]
+    fn fragment_shader(
+        &self,
+        uniform: UniformSet,
+        input: VaryingFields,
+        output: &mut FragmentFields,
+    ) {
+        output.albedo = input.color;
+        output.normal = vec3(1.0, 0.0, 0.0);
+    }
 }
 
 struct Renderer {
-    program: Program<Uniform, Vertex, Fragment>,
+    program: Program<UniformSet, VertexSet, FragmentFields>,
     view_matrices: UniformBuffer<ViewMatrices>,
     texture: Texture2d,
 }
 
 impl Renderer {
     pub fn new(glace: &glace::Context) -> Result<Self, glace::InitError> {
-        let define = Define {
-            radians_per_sec: 1.0,
+        let program_def = MyProgram {
+            radians_per_sec: 3.0,
         };
-        let program = Program::new(glace, vertex, fragment, define)?;
+        let program = Program::new(glace, program_def)?;
         let view_matrices = UniformBuffer::new(glace, ViewMatrices::default())?;
         let texture = Texture::new(glace)?;
 
@@ -94,12 +101,12 @@ impl Renderer {
 
     pub fn draw(
         &self,
-        data: &VertexData<Vertex>,
+        data: &VertexArray<VertexSet>,
     ) {
         self.program.draw(
-            &UniformBindings {
-                view_matrices: &self.view_matrices,
-                texture: &self.texture,
+            UniformSet {
+                view_matrices: self.view_matrices.data(),
+                texture: self.texture.sampler(),
             },
             data,
             &draw_params,
