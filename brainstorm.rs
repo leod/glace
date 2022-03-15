@@ -12,33 +12,35 @@ struct Vertex {
 
 #[derive(glace::Vertex)]
 struct Instance {
-    color: Vector3<f32>,
+    col: Vector3<f32>,
 }
 
 #[derive(glace::UniformSet)]
 struct UniformSet {
     #[layout(binding = 0)]
-    view_matrices: UniformData<ViewMatrices>,
+    view_matrices: UniformBlockInput<ViewMatrices>,
 
     #[layout(binding = 1)]
-    texture: UniformSampler<Texture2d>,
+    texture: UniformSamplerInput<Texture2d>,
 }
 
 #[derive(glace::VertexSet)]
 struct VertexSet {
-    instance: VertexData<Instance>,
-    vertex: VertexData<Vertex>,
+    instance: VertexInput<Instance>,
+
+    #[layout(divisor = 1)]
+    vertex: VertexInput<Vertex>,
 }
 
-#[derive(glace::VaryingFields)]
-struct VaryingFields {
-    color: Vector3<f32>,
+#[derive(glace::Varying)]
+struct Varying {
+    col: Vector3<f32>,
 }
 
-#[derive(glace::FragmentFields)]
-struct FragmentFields {
-    albedo: Vector3<f32>,
-    normal: Vector3<f32>,
+#[derive(glace::FragmentSet)]
+struct FragmentSet {
+    albedo: FragmentOutput<Vector3<f32>>,
+    normal: FragmentOutput<Vector3<f32>>,
 }
 
 struct MyProgram {
@@ -48,15 +50,15 @@ struct MyProgram {
 impl ProgramDef for MyProgram {
     type UniformSet = UniformSet;
     type VertexSet = VertexSet;
-    type VaryingFields = VaryingFields;
-    type FragmentFields = FragmentFields;
+    type Varying = Varying;
+    type FragmentSet = FragmentSet;
 
     #[glace(vertex_shader)]
     fn vertex_shader(
         &self,
         uniform: UniformSet,
         input: VertexSet,
-        output: &mut VaryingFields,
+        output: &mut Varying,
     ) {
         gl_Position = uniform.view_matrices.camera_to_ndc
             * uniform.view_matrices.world_to_camera
@@ -70,7 +72,7 @@ impl ProgramDef for MyProgram {
         &self,
         uniform: UniformSet,
         input: VaryingFields,
-        output: &mut FragmentFields,
+        output: &mut Varying,
     ) {
         output.albedo = input.color;
         output.normal = vec3(1.0, 0.0, 0.0);
@@ -78,7 +80,7 @@ impl ProgramDef for MyProgram {
 }
 
 struct Renderer {
-    program: Program<UniformSet, VertexSet, FragmentFields>,
+    program: Program<UniformSet, VertexSet, FragmentSet>,
     view_matrices: UniformBuffer<ViewMatrices>,
     texture: Texture2d,
 }
@@ -101,16 +103,17 @@ impl Renderer {
 
     pub fn draw(
         &self,
-        data: &VertexArray<VertexSet>,
+        vertices: &VertexStream<VertexSet>,
+        framebuffer: &Framebuffer<FragmentSet>,
     ) {
         self.program.draw(
             UniformSet {
-                view_matrices: self.view_matrices.data(),
-                texture: self.texture.sampler(),
+                view_matrices: self.view_matrices.input(),
+                texture: self.texture.input(),
             },
-            data,
-            &draw_params,
+            vertices,
             &framebuffer,
+            &draw_params,
         );
     }
 }
