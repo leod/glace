@@ -5,12 +5,33 @@ use super::GenError;
 
 use GenError::Unsupported;
 
+pub fn bin_op(o: &syn::BinOp) -> Result<glsl::AssignmentOp, GenError> {
+    Ok(match o {
+        syn::BinOp::AddEq(_) => glsl::AssignmentOp::Add,
+        syn::BinOp::SubEq(_) => glsl::AssignmentOp::Sub,
+        syn::BinOp::MulEq(_) => glsl::AssignmentOp::Mult,
+        syn::BinOp::DivEq(_) => glsl::AssignmentOp::Div,
+        syn::BinOp::RemEq(_) => glsl::AssignmentOp::Mod,
+        syn::BinOp::BitXorEq(_) => glsl::AssignmentOp::Xor,
+        syn::BinOp::BitAndEq(_) => glsl::AssignmentOp::And,
+        syn::BinOp::BitOrEq(_) => glsl::AssignmentOp::Or,
+        syn::BinOp::ShlEq(_) => glsl::AssignmentOp::LShift,
+        syn::BinOp::ShrEq(_) => glsl::AssignmentOp::RShift,
+        o => {
+            return Err(Unsupported(
+                o.span(),
+                format!("unsupported binary assigment op: {:?}", o),
+            ))
+        }
+    })
+}
+
 pub fn expr(e: &syn::Expr) -> Result<glsl::Expr, GenError> {
     match e {
-        syn::Expr::Array(e) => Err(Unsupported(e.span(), "array")),
+        syn::Expr::Array(e) => Err(Unsupported(e.span(), "array".into())),
         syn::Expr::Assign(e) => {
             if !e.attrs.is_empty() {
-                return Err(Unsupported(e.span(), "attributes"));
+                return Err(Unsupported(e.span(), "attributes".into()));
             }
             Ok(glsl::Expr::Assignment(
                 Box::new(expr(&e.left)?),
@@ -18,7 +39,16 @@ pub fn expr(e: &syn::Expr) -> Result<glsl::Expr, GenError> {
                 Box::new(expr(&e.right)?),
             ))
         }
-        syn::Expr::AssignOp(_) => todo!(),
+        syn::Expr::AssignOp(e) => {
+            if !e.attrs.is_empty() {
+                return Err(Unsupported(e.span(), "attributes".into()));
+            }
+            Ok(glsl::Expr::Assignment(
+                Box::new(expr(&e.left)?),
+                bin_op(&e.op)?,
+                Box::new(expr(&e.right)?),
+            ))
+        }
         syn::Expr::Async(_) => todo!(),
         syn::Expr::Await(_) => todo!(),
         syn::Expr::Binary(_) => todo!(),

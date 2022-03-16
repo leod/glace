@@ -8,5 +8,5 @@ pub enum GenError {
     IdentifierError(#[from] IdentifierError),
 
     #[error("unsupported at {0:?}: {1}")]
-    Unsupported(Span, &'static str),
+    Unsupported(Span, String),
 }
