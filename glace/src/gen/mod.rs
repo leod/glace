@@ -1,5 +1,6 @@
 mod error;
 
+pub mod code;
 pub mod uniform;
 
 pub use error::GenError;

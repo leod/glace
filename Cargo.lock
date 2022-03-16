@@ -68,6 +68,9 @@ dependencies = [
  "glace-derive",
  "glow",
  "glsl",
+ "proc-macro2",
+ "quote",
+ "syn",
  "thiserror",
 ]
 
