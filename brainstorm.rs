@@ -17,10 +17,9 @@ struct Instance {
 
 #[derive(glace::UniformSet)]
 struct UniformSet {
-    #[layout(binding = 0)]
     view_matrices: UniformBlockInput<ViewMatrices>,
 
-    #[layout(binding = 1)]
+    #[layout(binding = 2)]
     texture: UniformSamplerInput<Texture2d>,
 }
 
@@ -32,7 +31,7 @@ struct VertexSet {
     vertex: VertexInput<Vertex>,
 }
 
-#[derive(glace::Varying)]
+#[derive(glace::Fields)]
 struct Varying {
     col: Vector3<f32>,
 }
@@ -71,8 +70,8 @@ impl ProgramDef for MyProgram {
     fn fragment_shader(
         &self,
         uniform: UniformSet,
-        input: VaryingFields,
-        output: &mut Varying,
+        input: Varying,
+        output: &mut Fragment,
     ) {
         output.albedo = input.color;
         output.normal = vec3(1.0, 0.0, 0.0);
