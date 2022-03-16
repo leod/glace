@@ -1,4 +1,5 @@
 use glsl::{parser::ParseError, syntax::IdentifierError};
+use proc_macro2::Span;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -6,6 +7,6 @@ pub enum GenError {
     #[error("identifier error: {0:?}")]
     IdentifierError(#[from] IdentifierError),
 
-    #[error("parse error: {0:?}")]
-    ParseError(#[from] ParseError),
+    #[error("unsupported at {0:?}: {1}")]
+    Unsupported(Span, &'static str),
 }
