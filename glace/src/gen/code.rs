@@ -5,7 +5,7 @@ use super::GenError;
 
 use GenError::Unsupported;
 
-pub fn bin_op(o: &syn::BinOp) -> Result<glsl::AssignmentOp, GenError> {
+pub fn assign_op(o: &syn::BinOp) -> Result<glsl::AssignmentOp, GenError> {
     Ok(match o {
         syn::BinOp::AddEq(_) => glsl::AssignmentOp::Add,
         syn::BinOp::SubEq(_) => glsl::AssignmentOp::Sub,
@@ -45,13 +45,13 @@ pub fn expr(e: &syn::Expr) -> Result<glsl::Expr, GenError> {
             }
             Ok(glsl::Expr::Assignment(
                 Box::new(expr(&e.left)?),
-                bin_op(&e.op)?,
+                assign_op(&e.op)?,
                 Box::new(expr(&e.right)?),
             ))
         }
-        syn::Expr::Async(_) => todo!(),
-        syn::Expr::Await(_) => todo!(),
-        syn::Expr::Binary(_) => todo!(),
+        syn::Expr::Async(_) => Err(Unsupported(e.span(), "async".into())),
+        syn::Expr::Await(_) => Err(Unsupported(e.span(), "await".into())),
+        syn::Expr::Binary(e) => todo!(),
         syn::Expr::Block(_) => todo!(),
         syn::Expr::Box(_) => todo!(),
         syn::Expr::Break(_) => todo!(),
