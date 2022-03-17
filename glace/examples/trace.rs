@@ -20,16 +20,21 @@ fn main() {
             return y * y - z;
         }
     };
+    let rustish = quote! {
+        {
+            x * 3;
+        }
+    };
     let rustish_tree: syn::Block = syn::parse2(rustish).unwrap();
 
-    let trace = {
+    /*let trace = {
         {
             let mut glace_block_ = Vec::new();
 
             let x = 5;
             glace_block_.append(TypedExpr(Type::type_specifier(x)))
         }
-    };
+    };*/
 
     println!("{:?}", rustish_tree);
 }

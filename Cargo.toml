@@ -1,2 +1,2 @@
 [workspace]
-members = ["glace", "glace-derive"]
+members = ["glace", "glace-derive", "glace-rush"]
